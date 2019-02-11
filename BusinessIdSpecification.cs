@@ -1,51 +1,129 @@
-public class BusinessIdSpecification : ISpecification<String> {
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-    private string[] id_list = {"kokeilaan","miten","toimii"};
+namespace cgi
+{
+    using System;
+    namespace BusinessIdSpecification
+    {
 
-    public BusinessIdSpecification (string[] test_id_list){
-
-        string[] incorect_id;
-
-        for (int i = 0; i < test_id_list.Length; i++)
+        public interface ISpecification<in TEntity>
         {
-            string[] list = {test_id_list[i], id_list[i]}
-            if (!ISpecification(list))
+            IEnumerable<string> ReasonsForDissatisfaction { get; }
+            bool IsSatisfiedBy(TEntity entity);
+        }
+
+        public class BusinessIdSpecification<TEntity> : ISpecification<TEntity>
+        {
+
+            public string[] fail = null;
+            private string id = "testi";
+
+            public IEnumerable<string> ReasonsForDissatisfaction
             {
-                incorect_id.add(list[i]);
-                Console.WriteLine("incorect");
+                get;
+                private set;
+            }
+
+            public void Setlist(string[] list)
+            {
+                ReasonsForDissatisfaction = list;
+            }
+
+            public bool IsSatisfiedBy(TEntity entity)
+            { 
+                if(entity.Equals(id))
+                {
+                    Console.WriteLine("True");
+                    Console.WriteLine(entity.ToString());
+                    return true;
+                }
+                else
+                {
+                    Console.WriteLine("False");
+                    string value = entity.ToString();
+                    if(value.Length == id.Length)
+                    {
+                        string[] fail = new string[value.Length];
+                        for (int i = 0; i < value.Length; i++)
+                        {
+                            if (value[i].Equals(id[i]))
+                            {
+                                fail[i] = null;
+                            }
+                            else
+                            {
+                                fail[i] = value[i].ToString();
+                                Console.WriteLine(value[i].ToString());
+                            }
+                        }
+                    }
+                    if (value.Length > id.Length)
+                    {
+                        string[] fail = new string[value.Length];
+                        for (int i = 0; i < value.Length; i++)
+                        {
+                            if(i<id.Length)
+                            {
+                                if (value[i].Equals(id[i]))
+                                {
+                                    fail[i] = null;
+                                }
+                                else
+                                {
+                                    fail[i] = value[i].ToString();
+                                    Console.WriteLine(value[i].ToString());
+                                }
+                            }
+                            else
+                            {
+                                fail[i] = value[i].ToString();
+                                Console.WriteLine(value[i].ToString());
+                            }
+                        }
+                    }
+
+                    if (value.Length < id.Length)
+                    {
+                        string[] fail = new string[id.Length];
+                        for (int i = 0; i < id.Length; i++)
+                        {
+                            if (i < value.Length)
+                            {
+                                if (value[i].Equals(id[i]))
+                                {
+                                    fail[i] = null;
+                                }
+                                else
+                                {
+                                    fail[i] = value[i].ToString();
+                                }
+                            }
+                            else
+                            {
+                                fail[i] = "#";
+                                Console.WriteLine("#");
+                            }
+                        }
+                    }
+                    ReasonsForDissatisfaction = fail;
+                    return false;
+                }
             }
         }
-        int sum = 0;
-        foreach (string[] incorect_id in ReasonsForDissatisfaction)
+        public class testaus
         {
-            Console.WriteLine(incorect_id[sum]);
-            sum++;
+            static void Main()
+            {
+                string tunnus = "kk";
+                BusinessIdSpecification<string> testi = new BusinessIdSpecification<string>();
+                testi.IsSatisfiedBy(id);
+                string[] virheet = testi.ReasonsForDissatisfaction.ToArray();
+                Console.ReadLine();
+            }
         }
-        return ReasonsForDissatisfaction;
-    }
-    public IEnumerable<string> ReasonsForDissatisfaction
-    {
-        get => _ReasonsForDissatisfaction;
-    }
-
-    public ISpecification(TEntity entity)
-    {
-        if(entity[0] == entity[1])
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-}
-
-public class app
-{
-    static void Main()
-    {
-        string[] id_list = { "kokeilaan", "mita", "toimii" };
-        BusinessIdSpecification(id_list);
     }
 }
